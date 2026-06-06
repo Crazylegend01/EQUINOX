@@ -1,69 +1,30 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Helper functions ───────────────────────────────────
-    function isSignedIn() {
-      return request.auth != null;
-    }
+    function isAuth()      { return request.auth != null; }
+    function isSelf(uid)   { return isAuth() && request.auth.uid == uid; }
+    function userRole()    { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role; }
+    function isAdmin()     { return isAuth() && userRole() == 'super_admin'; }
+    function isSubAdmin()  { return isAuth() && userRole() == 'sub_admin'; }
 
-    function isSelf(uid) {
-      return isSignedIn() && request.auth.uid == uid;
-    }
-
-    function isAdmin() {
-      return isSignedIn() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
-    }
-
-    function isSubAdmin() {
-      return isSignedIn() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'sub_admin';
-    }
-
-    function hasPermission(perm) {
-      return isSignedIn() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[perm] == true;
-    }
-
-    // ── Users collection ───────────────────────────────────
     match /users/{uid} {
-      // Users can read their own profile; admins can read all
-      allow read: if isSelf(uid) || isAdmin() || isSubAdmin();
-
-      // Only the user can update their own non-sensitive fields
-      allow update: if isSelf(uid) &&
-        !request.resource.data.diff(resource.data).affectedKeys()
-          .hasAny(['role', 'permissions', 'isActive']);
-
-      // Admins can update any user
-      allow update: if isAdmin();
-
-      // Only admins can create (register handled by Firebase Auth trigger)
-      allow create: if isSignedIn();
-
+      allow read:   if isSelf(uid) || isAdmin() || isSubAdmin();
+      allow create: if isAuth();
+      allow update: if isSelf(uid) && !request.resource.data.diff(resource.data)
+                       .affectedKeys().hasAny(['role','permissions','isActive'])
+                    || isAdmin();
       allow delete: if isAdmin();
     }
 
-    // ── Chats collection ───────────────────────────────────
     match /chats/{chatId} {
-      // Users can only access their own chats
-      allow read, write: if isSignedIn() &&
-        request.auth.uid == resource.data.userId;
+      allow read, write: if isAuth() && request.auth.uid == resource.data.userId;
+      allow create:      if isAuth() && request.auth.uid == request.resource.data.userId;
+      allow read:        if isAdmin();
 
-      // Allow creating a new chat doc if userId matches
-      allow create: if isSignedIn() &&
-        request.auth.uid == request.resource.data.userId;
-
-      // Admins can read all chats (for analytics)
-      allow read: if isAdmin();
-
-      // Messages sub-collection
-      match /messages/{messageId} {
-        allow read, write: if isSignedIn() &&
+      match /messages/{msgId} {
+        allow read, write: if isAuth() &&
           request.auth.uid == get(/databases/$(database)/documents/chats/$(chatId)).data.userId;
-
         allow read: if isAdmin();
       }
     }
