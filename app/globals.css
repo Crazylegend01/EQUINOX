@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── CSS Variables per theme ─────────────────────────── */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-panel: #efefef;
+  --bg-input: #e8e8e8;
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --accent: #ff0033;
+  --accent-hover: #cc0029;
+  --border: #ddd;
+  --scrollbar: #ccc;
+}
+
+.dark {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-panel: #141414;
+  --bg-input: #222222;
+  --text-primary: #f0f0f0;
+  --text-secondary: #aaaaaa;
+  --text-muted: #666666;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --border: #2a2a2a;
+  --scrollbar: #333;
+}
+
+.dark.theme-crimson-noir {
+  --bg-primary: #050505;
+  --bg-secondary: #0d0d0d;
+  --bg-panel: #0a0a0a;
+  --bg-input: #141414;
+  --text-primary: #f5f5f5;
+  --text-secondary: #999999;
+  --text-muted: #555555;
+  --accent: #ff0033;
+  --accent-hover: #cc0029;
+  --border: #1f1f1f;
+  --scrollbar: #222;
+}
+
+/* ── Base styles ─────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Custom scrollbar ────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ── Utility classes ─────────────────────────────────── */
+@layer components {
+  .bg-app-primary    { background-color: var(--bg-primary); }
+  .bg-app-secondary  { background-color: var(--bg-secondary); }
+  .bg-app-panel      { background-color: var(--bg-panel); }
+  .bg-app-input      { background-color: var(--bg-input); }
+  .text-app-primary  { color: var(--text-primary); }
+  .text-app-secondary{ color: var(--text-secondary); }
+  .text-app-muted    { color: var(--text-muted); }
+  .border-app        { border-color: var(--border); }
+  .accent            { color: var(--accent); }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    background-color: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background-color: var(--accent-hover); }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    background: transparent;
+    color: var(--text-secondary);
+  }
+  .btn-ghost:hover {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+  }
+
+  .input-base {
+    @apply w-full px-4 py-3 rounded-xl outline-none transition-all duration-200 text-sm;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .input-base:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent); }
+  .input-base::placeholder { color: var(--text-muted); }
+
+  .panel {
+    @apply rounded-2xl;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border);
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer transition-all duration-150;
+    color: var(--text-secondary);
+  }
+  .sidebar-item:hover {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+  }
+  .sidebar-item.active {
+    background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
+  }
+}
+
+/* ── Prose / Markdown overrides ──────────────────────── */
+.prose-equinox { @apply text-sm leading-relaxed; color: var(--text-primary); }
+.prose-equinox h1, .prose-equinox h2, .prose-equinox h3 { @apply font-semibold mt-4 mb-2; color: var(--text-primary); }
+.prose-equinox h1 { @apply text-xl; }
+.prose-equinox h2 { @apply text-lg; }
+.prose-equinox h3 { @apply text-base; }
+.prose-equinox p  { @apply mb-3 leading-7; }
+.prose-equinox ul, .prose-equinox ol { @apply mb-3 pl-5; }
+.prose-equinox li { @apply mb-1; }
+.prose-equinox ul li { list-style-type: disc; }
+.prose-equinox ol li { list-style-type: decimal; }
+.prose-equinox code:not(pre code) {
+  @apply px-1.5 py-0.5 rounded text-xs font-mono;
+  background-color: var(--bg-input);
+  color: var(--accent);
+}
+.prose-equinox pre { @apply rounded-xl overflow-hidden my-3; border: 1px solid var(--border); }
+.prose-equinox a { color: var(--accent); text-decoration: underline; }
+.prose-equinox table { @apply w-full text-sm border-collapse mb-3; }
+.prose-equinox th { @apply px-3 py-2 text-left font-semibold border-b; border-color: var(--border); }
+.prose-equinox td { @apply px-3 py-2 border-b; border-color: var(--border); }
+.prose-equinox blockquote {
+  @apply pl-4 italic my-3;
+  border-left: 3px solid var(--accent);
+  color: var(--text-secondary);
+}
+.prose-equinox hr { @apply my-4; border-color: var(--border); }
+
+/* ── Streaming cursor ────────────────────────────────── */
+.streaming-cursor::after {
+  content: '▋';
+  animation: blink 1s step-end infinite;
+  color: var(--accent);
+  margin-left: 1px;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── Loading dots ────────────────────────────────────── */
+.loading-dot { animation: loadingDot 1.4s infinite ease-in-out both; }
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes loadingDot {
+  0%,80%,100% { transform: scale(0); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
